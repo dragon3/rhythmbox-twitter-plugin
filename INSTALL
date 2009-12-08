@@ -1,0 +1,12 @@
+* Ubuntu 9.04 - Jaunty Jackalope
+
+$ sudo apt-get install python-simplejson
+$ cd /tmp
+$ wget http://python-twitter.googlecode.com/files/python-twitter-0.6.tar.gz
+$ tar zxfv python-twitter-0.6.tar.gz
+$ cd python-twitter-0.6
+$ python setup.py build
+$ sudo python setup.py install
+$ sudo mkdir /usr/lib/rhythmbox/plugins/twitter-plugin
+$ cd /usr/lib/rhythmbox/plugins/twitter-plugin
+$ sudo wget http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin-prefes.glade http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin.py http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin.rb-plugin

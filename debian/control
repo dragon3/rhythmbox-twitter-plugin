@@ -1,0 +1,12 @@
+Source: rhythmbox-twitter-plugin
+Section: unknown
+Priority: extra
+Maintainer: Ryuzo Yamamoto <ryuzo.yamamoto@gmail.com>
+Build-Depends: debhelper (>= 7)
+Standards-Version: 3.7.3
+Homepage: http://trac.codecheck.in/share/browser/platform/rhythmbox/twitter-plugin
+
+Package: rhythmbox-twitter-plugin
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, rhythmbox, python-twitter
+Description: This is a plugin for Rhythmbox that posts current played song album title and author.

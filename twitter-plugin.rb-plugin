@@ -1,0 +1,9 @@
+[RB Plugin]
+Loader=python
+Module=twitter-plugin
+IAge=1
+Name=Twitter notifier
+Description=Post current played song to Twitter.
+Authors=Ryuzo Yamamoto
+Copyright=Copyright © 2008, Ryuzo Yamamoto
+Website=http://codecheck.in,http://d.hatena.ne.jp/dragon3

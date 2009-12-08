@@ -1,0 +1,19 @@
+This package was debianized by Ryuzo Yamamoto <ryuzo.yamamoto@gmail.com> on
+Sun, 08 Mar 2009 22:31:42 +0900.
+
+It was downloaded from <http://trac.codecheck.in/share/browser/platform/rhythmbox/twitter-plugin>
+
+Upstream Author(s):
+
+    Ryuzo Yamaomoto <ryuzo.yamamoto@gmail.com>
+
+Copyright:
+
+    Copyright (C) 2009 Ryuzo Yamamoto
+
+License:
+
+    GNU General Public License
+
+The Debian packaging is (C) 2009, Ryuzo Yamamoto <ryuzo.yamamoto@gmail.com> and
+is licensed under the GPL, see `/usr/share/common-licenses/GPL'.
