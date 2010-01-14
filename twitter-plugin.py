@@ -73,12 +73,13 @@ class TwitterPlugin(rb.Plugin):
 		response = ""
 		if artist != None:
 			response = artist
-		if album != None:
-			if response:
-				response += " - " + album
-			else:
-				response = album
- 		elif title != None:
+		# if album != None:
+		#	if response:
+		#		response += " - " + album
+		#	else:
+		#		response = album
+		# elif title != None:
+		if title != None:
  			if response:
  				response += " - " + title
  			else:
