@@ -1,0 +1,9 @@
+
+* 1.01
+  Apply changes from Storm Dragon (stormdragon2976). Thanks !
+  - changed the format of the tweets to post with ...
+  -- the #nowlistening tag.
+  -- the lastfm url about the current album.
+
+* 1.00
+  first release.

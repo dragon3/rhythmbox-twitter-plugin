@@ -9,4 +9,4 @@ $ python setup.py build
 $ sudo python setup.py install
 $ sudo mkdir /usr/lib/rhythmbox/plugins/twitter-plugin
 $ cd /usr/lib/rhythmbox/plugins/twitter-plugin
-$ sudo wget http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin-prefes.glade http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin.py http://svn.codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin.rb-plugin
+$ sudo wget http://github.com/dragon3/rhythmbox-twitter-plugin/raw/master/twitter-plugin-prefes.glade http://github.com/dragon3/rhythmbox-twitter-plugin/raw/master/twitter-plugin.py http://github.com/dragon3/rhythmbox-twitter-plugin/raw/master/twitter-plugin.rb-plugin

@@ -1,9 +1,8 @@
 #
 # twitter-plugin.py
 # This file is part of twitter-plugin
-# $Id: /mirror/codecheck.in/platform/rhythmbox/twitter-plugin/twitter-plugin.py 14100 2009-03-08T14:06:27.637680Z dragon3  $
 #
-# Copyright (C) 2008 - 2009 Ryuzo Yamamoto
+# Copyright (C) 2008 - 2010 Ryuzo Yamamoto
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,9 +13,10 @@
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
 import rhythmdb, rb
 import gobject
@@ -24,6 +24,9 @@ import gtk, gtk.glade
 import gconf, gnomevfs, gnome
 import twitter
 import os
+import urllib
+
+VERSION = '1.01'
 
 gconf_keys = {	'username': '/apps/rhythmbox/plugins/twitter-plugin/username',
 		'password': '/apps/rhythmbox/plugins/twitter-plugin/password'
@@ -59,10 +62,12 @@ class TwitterPlugin(rb.Plugin):
 
 		api = twitter.Api(username, password);
 		api.SetSource('rhythmboxtwitterplugin')
-		api.SetXTwitterHeaders('Rhythmbox twitter-plugin', 'http://trac.codecheck.in/share/browser/platform/rhythmbox/twitter-plugin', '0.1')
+		api.SetXTwitterHeaders('Rhythmbox twitter-plugin', 'http://trac.codecheck.in/share/browser/platform/rhythmbox/twitter-plugin', '1.01')
 		return api
 		
 	def song_change(self, player, entry):
+		#audiotwit users change the next line to True
+		audioTwit = False
 		artist = None
 		album = None
 		title = None
@@ -70,20 +75,26 @@ class TwitterPlugin(rb.Plugin):
 			artist = self.get_song_info(entry)[0]
 			album = self.get_song_info(entry)[1]
 			title = self.get_song_info(entry)[2]
-		response = ""
+		else:
+			return
+
+		response = "#nowlistening to "
 		if artist != None:
-			response = artist
+			if title != None:
+				response += title + " by "
+			if artist.replace(" ", "") == artist: response += "#"
+			response += artist + " from "
 		if album != None:
 			if response:
-				response += " - " + album
+				response += album + "."
+				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
+				lastFmUrl = lastFmUrl.replace("%20", "%2B")
+				lastFmUrl = self.shortUrl(lastFmUrl)
+				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
 			else:
-				response = album
- 		elif title != None:
- 			if response:
- 				response += " - " + title
- 			else:
- 				response = title
-		newStatus = 'Listening to '+response
+				response = " the " + album + " album."
+		if audioTwit == True: response = "@listensto " + artist + " - " + title
+		newStatus = response
 		if response and newStatus != self.lastStatus:
 			self.get_twitter_api().PostUpdate(newStatus)
 			self.lastStatus = newStatus
@@ -101,6 +112,9 @@ class TwitterPlugin(rb.Plugin):
 			dialog = TwitterConfigureDialog (glade_file).get_dialog()
 		dialog.present()
 		return dialog
+
+	def shortUrl(self, url):
+		return urllib.urlopen("http://is.gd/api.php?longurl=" + url).read()
 	
 class TwitterConfigureDialog (object):
 	def __init__(self, glade_file):

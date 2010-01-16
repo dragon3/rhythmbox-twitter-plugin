@@ -1,3 +1,11 @@
 * 簡単な説明サイト (英語で)
 * 簡単なセットアップドキュメント (英語で)
 * debパッケージング
+
+# from stormdragon2976
+* Add setting in configuration to select #nowlistening or audiotwit
+* Add checkbox in configuration to automatically tweet current song. If not true, place a button in the player to tweet current song.
+* Make tweet button disabled if song has already been tweeted.
+* Get rid of the blank tweet bug.
+* probably more stuff but I can't think of it right now.
+
