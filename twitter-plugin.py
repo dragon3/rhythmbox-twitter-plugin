@@ -83,10 +83,10 @@ class TwitterPlugin(rb.Plugin):
 			if title != None:
 				response += title + " by "
 			if artist.replace(" ", "") == artist: response += "#"
-			response += artist + " from "
+			response += artist
 		if album != None:
 			if response:
-				response += album + "."
+				response += " from " + album + "."
 				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
 				lastFmUrl = lastFmUrl.replace("%20", "%2B")
 				lastFmUrl = self.shortUrl(lastFmUrl)
