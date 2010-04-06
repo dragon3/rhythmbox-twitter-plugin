@@ -2,7 +2,7 @@
 # twitter-plugin.py
 # This file is part of twitter-plugin
 #
-# Copyright (C) 2008 - 2010 Ryuzo Yamamoto
+# Copyright (C) Ryuzo Yamamoto
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ class TwitterPlugin(rb.Plugin):
 
 		api = twitter.Api(username, password);
 		api.SetSource('rhythmboxtwitterplugin')
-		api.SetXTwitterHeaders('Rhythmbox twitter-plugin', 'http://trac.codecheck.in/share/browser/platform/rhythmbox/twitter-plugin', '1.01')
+		api.SetXTwitterHeaders('Rhythmbox twitter-plugin', 'http://github.com/dragon3/rhythmbox-twitter-plugin', '1.01')
 		return api
 		
 	def song_change(self, player, entry):
