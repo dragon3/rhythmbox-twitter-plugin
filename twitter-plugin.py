@@ -18,19 +18,37 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+from random import getrandbits
+from time import time
+
 import rhythmdb, rb
 import gobject
 import gtk, gtk.glade
 import gconf, gnomevfs, gnome
-import twitter
 import os
+import hmac, hashlib
+import sys
 import urllib
+import urllib2
+import urlparse
 
-VERSION = '1.01'
+VERSION = '2.00'
+gconf_keys = {
+    'username': '/apps/rhythmbox/plugins/twitter-plugin/username',
+    'password': '/apps/rhythmbox/plugins/twitter-plugin/password',
+    'access_token': '/apps/rhythmbox/plugins/twitter-plugin/access_token',
+    'access_token_secret': '/apps/rhythmbox/plugins/twitter-plugin/access_token_secret'
+    }
 
-gconf_keys = {	'username': '/apps/rhythmbox/plugins/twitter-plugin/username',
-		'password': '/apps/rhythmbox/plugins/twitter-plugin/password'
-		}
+consumer_tokens = {
+    'key': '******',
+    'secret': '******'
+    }
+
+twitter_urls = {
+    'access_token': 'https://api.twitter.com/oauth/access_token',
+    'post': 'http://twitter.com/statuses/update.json'
+    }
 
 class TwitterPlugin(rb.Plugin):
 
@@ -40,14 +58,13 @@ class TwitterPlugin(rb.Plugin):
 	def activate(self, shell):
 		self.shell = shell
 		player = shell.get_player()
-
 		
 		self.psc_id = player.connect ('playing-song-changed', self.song_change)
 		self.lastStatus = ""
 		if player.get_playing_entry():
 			self.song_change (player, player.get_playing_entry())
 		self.db = None
-	
+
 	def deactivate(self, shell):
 		self.shell.get_player().disconnect (self.psc_id)
 		del self.psc_id
@@ -56,15 +73,6 @@ class TwitterPlugin(rb.Plugin):
 		del self.shell
 		del self.lastStatus
 
-	def get_twitter_api(self):
-		username = gconf.client_get_default().get_string(gconf_keys['username'])
-		password = gconf.client_get_default().get_string(gconf_keys['password'])
-
-		api = twitter.Api(username, password);
-		api.SetSource('rhythmboxtwitterplugin')
-		api.SetXTwitterHeaders('Rhythmbox twitter-plugin', 'http://github.com/dragon3/rhythmbox-twitter-plugin', '1.01')
-		return api
-		
 	def song_change(self, player, entry):
 		#audiotwit users change the next line to True
 		audioTwit = False
@@ -89,14 +97,14 @@ class TwitterPlugin(rb.Plugin):
 				response += " from " + album + "."
 				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
 				lastFmUrl = lastFmUrl.replace("%20", "%2B")
-				lastFmUrl = self.shortUrl(lastFmUrl)
+				lastFmUrl = self.shorten_url(lastFmUrl)
 				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
 			else:
 				response = " the " + album + " album."
 		if audioTwit == True: response = "@listensto " + artist + " - " + title
 		newStatus = response
 		if response and newStatus != self.lastStatus:
-			self.get_twitter_api().PostUpdate(newStatus)
+			self.post(newStatus)
 			self.lastStatus = newStatus
 		
 	def get_song_info(self, entry):
@@ -113,9 +121,86 @@ class TwitterPlugin(rb.Plugin):
 		dialog.present()
 		return dialog
 
-	def shortUrl(self, url):
+	def create_account_dialog(self, dialog=None):
+		if not dialog:
+			glade_file = self.find_file("twitter-plugin-account.glade")
+			dialog = TwitterAccountDialog (self, glade_file).get_dialog()
+		dialog.present()
+		return dialog
+
+	def shorten_url(self, url):
 		return urllib.urlopen("http://is.gd/api.php?longurl=" + url).read()
+
+	def post(self, message):
+		# self.create_account_dialog()
+		self.setup_access_token()
 	
+		# build parameters to post
+		params = {
+			'oauth_consumer_key' : consumer_tokens['key'],
+			'oauth_signature_method' : 'HMAC-SHA1',
+			'oauth_timestamp' : str(int(time())),
+			'oauth_nonce' : str(getrandbits(64)),
+			'oauth_version' : '1.0',
+			'oauth_token' : self.access_token,
+			}
+		params['status'] = urllib.quote(message, '')
+		params['oauth_signature'] = hmac.new(
+			'%s&%s' % (consumer_tokens['secret'], self.access_token_secret),
+			'&'.join([
+				'POST',
+				urllib.quote(twitter_urls['post'], ''),
+				urllib.quote('&'.join(['%s=%s' % (x, params[x])
+									   for x in sorted(params)]), '')
+				]),
+			hashlib.sha1).digest().encode('base64').strip()
+		del params['status']
+
+		# post with oauth token
+		req = urllib2.Request(twitter_urls['post'], data = urllib.urlencode(params))
+		req.add_data(urllib.urlencode({'status' : message}))
+		req.add_header('Authorization', 'OAuth %s' % ', '.join(
+			['%s="%s"' % (x, urllib.quote(params[x], '')) for x in params]))
+		res = urllib2.urlopen(req)
+	
+	def setup_access_token(self):
+		gconf_client = gconf.client_get_default()
+
+		if gconf_client.get_string(gconf_keys['access_token']) != None:
+			self.access_token = gconf_client.get_string(gconf_keys['access_token'])
+			self.access_token_secret = gconf_client.get_string(gconf_keys['access_token_secret'])
+			return
+
+		params = {
+			'oauth_consumer_key' : consumer_tokens['key'],
+			'oauth_signature_method' : 'HMAC-SHA1',
+			'oauth_timestamp' : str(int(time())),
+			'oauth_nonce' : str(getrandbits(64)),
+			'oauth_version' : '1.0',
+			'x_auth_mode' : 'client_auth',
+			'x_auth_username' : gconf_client.get_string(gconf_keys['username']),
+			'x_auth_password' : gconf_client.get_string(gconf_keys['password'])
+			}
+		params['oauth_signature'] = hmac.new(
+			'%s&%s' % (consumer_tokens['secret'], ''),
+			'&'.join([
+				'POST',
+				urllib.quote(twitter_urls['access_token'], ''),
+				urllib.quote('&'.join(['%s=%s' % (x, params[x])
+									   for x in sorted(params)]), '')
+				]),
+			hashlib.sha1).digest().encode('base64').strip()
+		
+		req = urllib2.Request(twitter_urls['access_token'], data = urllib.urlencode(params))
+		res = urllib2.urlopen(req)
+		token = urlparse.parse_qs(res.read())
+		token_key = token['oauth_token'][0]
+		token_secret = token['oauth_token_secret'][0]
+		gconf_client.set_string(gconf_keys['access_token'], token_key)
+		gconf_client.set_string(gconf_keys['access_token_secret'], token_secret)
+		self.access_token = token_key
+		self.access_token_secret = token_secret
+        
 class TwitterConfigureDialog (object):
 	def __init__(self, glade_file):
 		self.gconf = gconf.client_get_default()
@@ -148,3 +233,32 @@ class TwitterConfigureDialog (object):
 	def password_entry_changed (self, entry):
 		password_text = self.password_entry.get_text()
 		self.gconf.set_string(gconf_keys['password'], password_text)
+
+class TwitterAccountDialog (object):
+	def __init__(self, plugin, glade_file):
+		self.plugin = plugin
+		self.gconf = gconf.client_get_default()
+		gladexml = gtk.glade.XML(glade_file)
+
+		self.dialog = gladexml.get_widget('account_dialog')
+		self.username_entry = gladexml.get_widget('username_entry')
+		self.password_entry = gladexml.get_widget('password_entry')
+
+		self.dialog.connect("response", self.dialog_response)
+		self.username_entry.connect("changed", self.username_entry_changed)
+		self.password_entry.connect("changed", self.password_entry_changed)
+
+	def get_dialog (self):
+		return self.dialog
+
+	def dialog_response (self, dialog, response):
+		dialog.hide()
+		self.plugin.setup_access_token();
+
+	def username_entry_changed (self, entry):
+		username_text = self.username_entry.get_text()
+		self.plugin.username = username_text
+		
+	def password_entry_changed (self, entry):
+		password_text = self.password_entry.get_text()
+		self.plugin.password = password_text
