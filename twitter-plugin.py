@@ -31,6 +31,7 @@ import sys
 import urllib
 import urllib2
 import urlparse
+import base64
 
 VERSION = '2.00'
 gconf_keys = {
@@ -41,8 +42,8 @@ gconf_keys = {
     }
 
 consumer_tokens = {
-    'key': '******',
-    'secret': '******'
+    'key': 'NXlrU3psc1VIWjZkaHJhRTB5WG01UQ==',
+    'secret': 'RFBEbXRoVzRJQXUxcUdrSmV2VTdDc2RhS3FUdmdPN2tDMFlEY3g1OG1J',
     }
 
 twitter_urls = {
@@ -137,7 +138,7 @@ class TwitterPlugin(rb.Plugin):
 	
 		# build parameters to post
 		params = {
-			'oauth_consumer_key' : consumer_tokens['key'],
+			'oauth_consumer_key' : self.decode_token(consumer_tokens['key']),
 			'oauth_signature_method' : 'HMAC-SHA1',
 			'oauth_timestamp' : str(int(time())),
 			'oauth_nonce' : str(getrandbits(64)),
@@ -146,7 +147,7 @@ class TwitterPlugin(rb.Plugin):
 			}
 		params['status'] = urllib.quote(message, '')
 		params['oauth_signature'] = hmac.new(
-			'%s&%s' % (consumer_tokens['secret'], self.access_token_secret),
+			'%s&%s' % (self.decode_token(consumer_tokens['secret']), self.access_token_secret),
 			'&'.join([
 				'POST',
 				urllib.quote(twitter_urls['post'], ''),
@@ -172,7 +173,7 @@ class TwitterPlugin(rb.Plugin):
 			return
 
 		params = {
-			'oauth_consumer_key' : consumer_tokens['key'],
+			'oauth_consumer_key' : self.decode_token(consumer_tokens['key']),
 			'oauth_signature_method' : 'HMAC-SHA1',
 			'oauth_timestamp' : str(int(time())),
 			'oauth_nonce' : str(getrandbits(64)),
@@ -182,7 +183,7 @@ class TwitterPlugin(rb.Plugin):
 			'x_auth_password' : gconf_client.get_string(gconf_keys['password'])
 			}
 		params['oauth_signature'] = hmac.new(
-			'%s&%s' % (consumer_tokens['secret'], ''),
+			'%s&%s' % (self.decode_token(consumer_tokens['secret']), ''),
 			'&'.join([
 				'POST',
 				urllib.quote(twitter_urls['access_token'], ''),
@@ -200,6 +201,9 @@ class TwitterPlugin(rb.Plugin):
 		gconf_client.set_string(gconf_keys['access_token_secret'], token_secret)
 		self.access_token = token_key
 		self.access_token_secret = token_secret
+
+	def decode_token(self, token):
+		return base64.b64decode(token)
         
 class TwitterConfigureDialog (object):
 	def __init__(self, glade_file):
