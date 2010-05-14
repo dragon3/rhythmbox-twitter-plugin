@@ -1,10 +1,11 @@
 <?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
 <!DOCTYPE glade-interface SYSTEM "http://gazpacho.sicem.biz/gazpacho-0.1.dtd">
 <glade-interface>
-    <widget class="GtkDialog" id="preferences_dialog">
-        <property name="gravity">north</property>
+    <widget class="GtkDialog" id="pin_dialog">
+        <property name="destroy_with_parent">True</property>
         <property name="mnemonics_visible">False</property>
-        <property name="title" context="yes" translatable="yes">Twitter Plugin Preferences</property>
+        <property name="modal">True</property>
+        <property name="title" context="yes" translatable="yes">Twitter Account</property>
         <property name="type_hint">normal</property>
         <property name="visible">True</property>
         <property name="window_position">none</property>
@@ -13,13 +14,14 @@
                 <property name="border_width">2</property>
                 <property name="visible">True</property>
                 <child>
-                    <widget class="GtkVBox" id="twitter_vbox">
+                    <widget class="GtkVBox" id="pin_vbox">
                         <property name="border_width">5</property>
                         <property name="spacing">18</property>
                         <property name="visible">True</property>
                         <child>
                             <widget class="GtkLabel" id="label58">
-                                <property name="label" context="yes" translatable="yes">&lt;b&gt;Twitter Account&lt;/b&gt;</property>
+                                <property name="justify">center</property>
+                                <property name="label" context="yes" translatable="yes">&lt;b&gt;Please Input PIN&lt;/b&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="visible">True</property>
                                 <property name="xalign">0.0</property>
@@ -30,47 +32,27 @@
                             </packing>
                         </child>
                         <child>
-                            <widget class="GtkHBox" id="hbox1">
-                                <property name="spacing">18</property>
+                            <widget class="GtkHBox" id="hbox21">
                                 <property name="visible">True</property>
                                 <child>
-                                    <widget class="GtkHBox" id="hbox21">
-                                        <property name="border_width">5</property>
-                                        <property name="spacing">18</property>
+                                    <widget class="GtkLabel" id="pin_label">
+                                        <property name="label" context="yes" translatable="yes">PIN:</property>
+                                        <property name="mnemonic_widget">pin_entry</property>
+                                        <property name="use_underline">True</property>
                                         <property name="visible">True</property>
-                                        <child>
-                                            <widget class="GtkLabel" id="username_label">
-                                                <property name="label" context="yes" translatable="yes">Username:</property>
-                                                <property name="mnemonic_widget">username_entry</property>
-                                                <property name="use_underline">True</property>
-                                                <property name="visible">True</property>
-                                                <property name="xpad">8</property>
-                                            </widget>
-                                            <packing>
-                                                <property name="expand">False</property>
-                                                <property name="fill">False</property>
-                                            </packing>
-                                        </child>
-                                        <child>
-                                            <widget class="GtkEntry" id="username_entry">
-                                                <property name="editable">False</property>
-                                                <property name="invisible_char_set">True</property>
-                                                <property name="is_focus">True</property>
-                                                <property name="visible">True</property>
-                                            </widget>
-                                            <packing>
-                                                <property name="position">1</property>
-                                            </packing>
-                                        </child>
+                                        <property name="xpad">8</property>
                                     </widget>
+                                    <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">False</property>
+                                    </packing>
                                 </child>
                                 <child>
-                                    <widget class="GtkButton" id="connect_button">
-                                        <property name="image_position">bottom</property>
+                                    <widget class="GtkEntry" id="pin_entry">
+                                        <property name="invisible_char_set">True</property>
                                         <property name="is_focus">True</property>
-                                        <property name="label" context="yes" translatable="yes">Connect</property>
+                                        <property name="max_length">7</property>
                                         <property name="visible">True</property>
-                                        <property name="yalign">0.0</property>
                                     </widget>
                                     <packing>
                                         <property name="position">1</property>
@@ -97,7 +79,7 @@
                         <child>
                             <widget class="GtkButton" id="closebutton1">
                                 <property name="can_default">True</property>
-                                <property name="label">gtk-close</property>
+                                <property name="label">gtk-ok</property>
                                 <property name="use_stock">True</property>
                                 <property name="visible">True</property>
                             </widget>
