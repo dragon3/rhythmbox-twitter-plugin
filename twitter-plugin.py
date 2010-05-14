@@ -42,8 +42,6 @@ import oauth2 as oauth
 VERSION = '2.00'
 
 gconf_keys = {
-	# 'username': '/apps/rhythmbox/plugins/twitter-plugin/username',
-	# 'password': '/apps/rhythmbox/plugins/twitter-plugin/password',
 	'access_token': '/apps/rhythmbox/plugins/twitter-plugin/access_token',
 	'access_token_secret': '/apps/rhythmbox/plugins/twitter-plugin/access_token_secret',
 	'screen_name': '/apps/rhythmbox/plugins/twitter-plugin/screen_name',
@@ -91,6 +89,9 @@ class TwitterPlugin(rb.Plugin):
 
 		# oauth.Consumer object
 		self.consumer = None
+
+		# dialog opened
+		self.configure_dialog = None
 
 		self.psc_id = player.connect ('playing-song-changed', self.song_change)
 		if player.get_playing_entry():
@@ -163,14 +164,8 @@ class TwitterPlugin(rb.Plugin):
 	def create_configure_dialog(self, dialog=None):
 		if not dialog:
 			glade_file = self.find_file("twitter-plugin-prefes.glade")
-			dialog = TwitterConfigureDialog (self, glade_file).get_dialog()
-		dialog.present()
-		return dialog
-
-	def create_account_dialog(self, dialog=None):
-		if not dialog:
-			glade_file = self.find_file("twitter-plugin-account.glade")
-			dialog = TwitterAccountDialog (self, glade_file).get_dialog()
+			self.configure_dialog = TwitterConfigureDialog (self, glade_file)
+			dialog = self.configure_dialog.get_dialog()
 		dialog.present()
 		return dialog
 
@@ -242,11 +237,6 @@ class TwitterPlugin(rb.Plugin):
 		resp, content = client.request(TWITTER_URLS['access_token'], "POST")
 		access_token = dict(urlparse.parse_qsl(content))
 
-		# print >> sys.stderr, "Access Token:"
-		# print >> sys.stderr, "	  - oauth_token		   = %s" % access_token['oauth_token']
-		# print >> sys.stderr, "	  - oauth_token_secret = %s" % access_token['oauth_token_secret']
-		# print >> sys.stderr
-
 		# save gconf
 		gconf_client = gconf.client_get_default()
 		gconf_client.set_string(gconf_keys['access_token'], access_token['oauth_token'])
@@ -257,22 +247,15 @@ class TwitterPlugin(rb.Plugin):
 		self.access_token_secret = access_token['oauth_token_secret']
 		self.screen_name = access_token['screen_name']
 
-		# print >> sys.stderr, "access_token: " + access_token['oauth_token']
-		# print >> sys.stderr, "access_token_secret: " + access_token['oauth_token_secret']
-		# print >> sys.stderr, "screen_name: " + access_token['screen_name']
+		if self.configure_dialog:
+			self.configure_dialog.update_username()
+			self.configure_dialog = None
 
 	def get_request_token(self, client):
 		resp, content = client.request(TWITTER_URLS['request_token'], "GET")
 		if resp['status'] != '200':
 			raise Exception("Invalid response %s." % resp['status'])
-		request_token = dict(urlparse.parse_qsl(content))
-
-		# print >> sys.stderr, "Request Token:"
-		# print >> sys.stderr, "	  - oauth_token		   = %s" % request_token['oauth_token']
-		# print >> sys.stderr, "	  - oauth_token_secret = %s" % request_token['oauth_token_secret']
-		# print >> sys.stderr
-
-		return request_token
+		return dict(urlparse.parse_qsl(content))
 		
 	def decode_token(self, token):
 		return base64.b64decode(token)
@@ -285,13 +268,17 @@ class TwitterConfigureDialog (object):
 
 		self.dialog = gladexml.get_widget('preferences_dialog')
 		self.connect_button = gladexml.get_widget('connect_button')
-		self.username_entry = gladexml.get_widget('username_entry')
+		self.username_entry= gladexml.get_widget('username_entry')
 		if plugin.screen_name:
 			self.username_entry.set_text(plugin.screen_name)
 
 		self.dialog.connect("response", self.dialog_response)
 		self.connect_button.connect("pressed", self.connect)
 
+	def update_username (self):
+		self.username_entry.set_text(self.plugin.screen_name)
+		self.username_entry.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#990000"))
+		
 	def get_dialog (self):
 		return self.dialog
 
@@ -300,10 +287,6 @@ class TwitterConfigureDialog (object):
 
 	def dialog_response (self, dialog, response):
 		dialog.hide()
-	#	self.gconf.set_string(gconf_keys['username'], username_text)
-	# def password_entry_changed (self, entry):
-	#	password_text = self.password_entry.get_text()
-	#	self.gconf.set_string(gconf_keys['password'], password_text)
 
 class TwitterPinDialog (object):
 	def __init__(self, plugin, glade_file, request_token):
