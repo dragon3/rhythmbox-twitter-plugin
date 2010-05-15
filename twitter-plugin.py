@@ -39,7 +39,7 @@ from twitter import Api, User
 import urlparse
 import oauth2 as oauth
 
-VERSION = '2.00'
+VERSION = '1.02'
 
 gconf_keys = {
 	'access_token': '/apps/rhythmbox/plugins/twitter-plugin/access_token',

@@ -1,13 +1,12 @@
 
+ Rhythmbox Twitter Plugin
+==========================
+
 * What's this?
   This is a plugin for Rhythmbox that posts current played song album title and author.
 
 * How to install?
   See INSTALL
 
-* Your twitter username and password saved in Gconf.
-  username : /apps/rhythmbox/plugins/twitter-plugin/username
-  password : /apps/rhythmbox/plugins/twitter-plugin/password
-
 * Version
-  1.01
+  1.02
