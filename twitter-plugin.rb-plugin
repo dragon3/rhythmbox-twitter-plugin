@@ -2,8 +2,8 @@
 Loader=python
 Module=twitter-plugin
 IAge=1
-Name=Twitter notifier
+Name=Twitter plugin
 Description=Post current played song to Twitter.
 Authors=Ryuzo Yamamoto
 Copyright=Copyright © 2008-2010, Ryuzo Yamamoto
-Website=http://github.com/dragon3/rhythmbox-twitter-plugin
+Website=http://dragon3.github.com/rhythmbox-twitter-plugin/,http://github.com/dragon3/rhythmbox-twitter-plugin/

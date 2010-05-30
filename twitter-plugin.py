@@ -267,17 +267,19 @@ class TwitterConfigureDialog (object):
 		gladexml = gtk.glade.XML(glade_file)
 
 		self.dialog = gladexml.get_widget('preferences_dialog')
-		self.connect_button = gladexml.get_widget('connect_button')
-		self.username_entry= gladexml.get_widget('username_entry')
+		self.username_button = gladexml.get_widget('username_button')
+		self.username_button_label = gladexml.get_widget('username_button_label')
+		self.username_button_image = gladexml.get_widget('username_button_image')
 		if plugin.screen_name:
-			self.username_entry.set_text(plugin.screen_name)
+			self.username_button_image.set_visible(False)
+			self.username_button_label.set_label(plugin.screen_name)
 
 		self.dialog.connect("response", self.dialog_response)
-		self.connect_button.connect("pressed", self.connect)
+		self.username_button.connect("pressed", self.connect)
 
 	def update_username (self):
-		self.username_entry.set_text(self.plugin.screen_name)
-		self.username_entry.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("#990000"))
+		self.username_button_image.set_visible(True)
+		self.username_button_label.set_label(self.plugin.screen_name)
 		
 	def get_dialog (self):
 		return self.dialog
