@@ -16,13 +16,13 @@
     }
     #container {
       margin: 0 auto;
-      width: 700px;
+      width: 800px;
     }
 		h1 { font-size: 3.8em; color: #58282a; margin-bottom: 3px; }
 		h1 .small { font-size: 0.4em; }
 		h1 a { text-decoration: none }
 		h2 { font-size: 1.5em; color: #58282a; margin-top: 2em; }
-    h3 { text-align: center; color: #58282a; }
+    h3 { color: #58282a; margin-top: 1em; }
     a { color: #58282a; }
     .image { text-align:center; }
     .description { font-size: 1.2em; margin-bottom: 30px; margin-top: 30px; font-style: italic;}
@@ -32,6 +32,7 @@
     .footer { text-align:center; padding-top:30px; font-style: italic; }
     li { margin-bottom: .5em; }
     p { margin-left: 1em; }
+    img.screen { width: 600px; }
 	</style>
 	
 </head>
@@ -51,7 +52,7 @@
     <h1><a href="http://github.com/dragon3/rhythmbox-twitter-plugin">Rhytmbox Twitter Plugin</a></h1>
 
     <div class="image">
-      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-7DD00.png" />
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-64CAA.png" />
     </div>
 
     <div class="description">
@@ -71,13 +72,52 @@
     </p>
 
     <h2>Install</h2>
-    <p>
-      TODO
-    </p>
+    <h3>Ubuntu 10.04 - Lucid Lynx</h3>
+    <h4>1. Install python-simplejson & python-twitter</h4>
+    <pre>$ sudo apt-get install python-twitter</pre>
+    <h4>2. Install this plugin</h4>
+    <pre>$ cd /tmp
+$ wget http://github.com/dragon3/rhythmbox-twitter-plugin/tarball/master
+$ tar zxfv dragon3-rhythmbox-twitter-plugin-*.tar.gz
+$ cd dragon3-rhythmbox-twitter-plugin-*
+$ make install</pre>
+    <br />
+    <h3>Ubuntu 9.04 - Jaunty Jackalope</h3>
+    <h4>Install python-simplejson & python-twitter</h4>
+    <pre>$ sudo apt-get install python-simplejson
+$ cd /tmp
+$ wget http://python-twitter.googlecode.com/files/python-twitter-0.6.tar.gz
+$ tar zxfv python-twitter-0.6.tar.gz
+$ cd python-twitter-0.6
+$ python setup.py build
+$ sudo python setup.py install</pre>
+    <h4>Install this plugin</h4>
+    <pre>$ cd /tmp
+$ wget http://github.com/dragon3/rhythmbox-twitter-plugin/tarball/master
+$ tar zxfv dragon3-rhythmbox-twitter-plugin-*.tar.gz
+$ cd dragon3-rhythmbox-twitter-plugin-*
+$ make install</pre>
     
     <h2>Setting</h2>
+    <h3>1. Enable this plugin.</h3>
     <p>
-      TODO
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-6DC65.png" class="screen" alt="" />
+    </p>
+    <h3>2. Allow this plugin access to your Twitter account.</h3>
+    <p>
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-F6AEE.png" class="screen" alt="" />
+    </p>
+    <h3>3. Copy your PIN.</h3>
+    <p>
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-9CF5F.png" class="screen" alt="" />
+    </p>
+    <h3>4. Input your PIN.</h3>
+    <p>
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-51381.png" class="screen" alt="" />
+    </p>
+    <h3>5. If you would like to change your username, push button with your username.</h3>
+    <p>
+      <img src="https://cacoo.com/diagrams/mfpewQqq3YGSBCDp-DE8C2.png" class="screen" alt="" />
     </p>
     
     <h2>Authors</h2>
