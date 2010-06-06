@@ -45,6 +45,7 @@ gconf_keys = {
 	'access_token': '/apps/rhythmbox/plugins/twitter-plugin/access_token',
 	'access_token_secret': '/apps/rhythmbox/plugins/twitter-plugin/access_token_secret',
 	'screen_name': '/apps/rhythmbox/plugins/twitter-plugin/screen_name',
+	'when_post': '/apps/rhythmbox/plugins/twitter-plugin/when_post',
 	}
 
 CONSUMER_TOKENS = {
@@ -61,6 +62,21 @@ TWITTER_URLS = {
 	'post': 'http://twitter.com/statuses/update.json'
 	}
 
+menu_ui_str = """
+		<ui>
+			<menubar name="MenuBar">
+				<menu name="ControlMenu" action="Control">
+				  <menuitem name="ControlMenuTwitter" action="Twitter"/>
+				</menu>
+			</menubar>
+			<toolbar name="ToolBar">
+				<placeholder name="ToolBarPluginPlaceholder">
+					<toolitem name="Tweet" action="Tweet"/>
+				</placeholder>
+			</toolbar>
+		</ui>
+"""
+
 class TwitterPlugin(rb.Plugin):
 
 	def __init__(self):
@@ -70,7 +86,7 @@ class TwitterPlugin(rb.Plugin):
 		self.shell = shell
 		player = shell.get_player()
 
-		self.lastStatus = ""
+		self.last_status = ""
 		self.db = None
 
 		# consumer tokens
@@ -87,11 +103,18 @@ class TwitterPlugin(rb.Plugin):
 			self.access_token_secret = gconf_client.get_string(gconf_keys['access_token_secret'])
 			self.screen_name = gconf_client.get_string(gconf_keys['screen_name'])
 
+		self.when_post = gconf_client.get_string(gconf_keys['when_post'])
+		if self.when_post == 'manual_song':
+			self.activate_twitter_button()
+
 		# oauth.Consumer object
 		self.consumer = None
 
 		# dialog opened
 		self.configure_dialog = None
+
+		self.last_song = None
+		self.last_album = None
 
 		self.psc_id = player.connect ('playing-song-changed', self.song_change)
 		if player.get_playing_entry():
@@ -101,7 +124,7 @@ class TwitterPlugin(rb.Plugin):
 		self.shell.get_player().disconnect (self.psc_id)
 		del self.psc_id
 
-		del self.lastStatus
+		del self.last_status
 		if self.db:
 			del self.db
 
@@ -121,17 +144,26 @@ class TwitterPlugin(rb.Plugin):
 		del self.shell
 
 	def song_change(self, player, entry):
-		#audiotwit users change the next line to True
-		audioTwit = False
-		artist = None
-		album = None
-		title = None
-		if entry:
-			artist = self.get_song_info(entry)[0]
-			album = self.get_song_info(entry)[1]
-			title = self.get_song_info(entry)[2]
-		else:
+		if self.when_post == "auto_song":
+			self.handle_auto_song(player, entry)
+		elif self.when_post == "auto_album":
+			self.handle_auto_album(player, entry)
+		elif self.when_post == "manual_song":
 			return
+
+	def handle_auto_song(self, player, entry):
+		if entry == None:
+			return
+
+		song_info = self.get_song_info(entry)
+		artist = song_info[0]
+		album = song_info[1]
+		title = song_info[2]
+		if title == self.last_song:
+			return
+
+		# TODO: audiotwit users change the next line to True
+		audioTwit = False
 
 		response = "#nowlistening to "
 		if artist != None:
@@ -149,11 +181,94 @@ class TwitterPlugin(rb.Plugin):
 			else:
 				response = " the " + album + " album."
 		if audioTwit == True: response = "@listensto " + artist + " - " + title
-		newStatus = response
-		if response and newStatus != self.lastStatus:
-			self.post(newStatus)
-			self.lastStatus = newStatus
-		
+		new_status = response
+		if response and new_status != self.last_status:
+			self.post(new_status)
+			self.last_status = new_status
+		self.last_song = title
+
+	def handle_auto_album(self, player, entry):
+		if entry == None:
+			return
+
+		song_info = self.get_song_info(entry)
+		artist = song_info[0]
+		album = song_info[1]
+		title = song_info[2]
+		if album == None or album == self.last_album:
+			return
+
+		response = "#nowlistening to "
+		if album != None:
+			response += '"' + album + '"'
+		if artist != None:
+			response += " by "
+			if artist.replace(" ", "") == artist:
+				response += "#"
+			response += artist
+		new_status = response
+		if response and new_status != self.last_status:
+			self.post(new_status)
+			self.last_status = new_status
+
+	def handle_manual_title(self, control):
+		player = self.shell.get_player()
+		if player.get_playing_entry() == None:
+			return
+		entry = player.get_playing_entry()
+		song_info = self.get_song_info(entry)
+		artist = song_info[0]
+		album = song_info[1]
+		title = song_info[2]
+		if title == self.last_song:
+			return
+
+		response = "#nowlistening to "
+		if artist != None:
+			if title != None:
+				response += title + " by "
+			if artist.replace(" ", "") == artist: response += "#"
+			response += artist
+		if album != None:
+			if response:
+				response += " from " + album + "."
+				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
+				lastFmUrl = lastFmUrl.replace("%20", "%2B")
+				lastFmUrl = self.shorten_url(lastFmUrl)
+				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
+			else:
+				response = " the " + album + " album."
+		new_status = response
+		if response and new_status != self.last_status:
+			self.post(new_status)
+			self.last_status = new_status
+		self.last_song = title
+
+	def activate_twitter_button(self):
+		icon_file_name = self.find_file("icon/32.png")
+		iconsource = gtk.IconSource()
+		iconsource.set_filename(icon_file_name)
+		iconset = gtk.IconSet()
+		iconset.add_source(iconsource)
+		iconfactory = gtk.IconFactory()
+		iconfactory.add("twitter", iconset)
+		iconfactory.add_default()
+
+		self.action_group = gtk.ActionGroup('TwitterActionGroup')
+		action = gtk.Action("Tweet", "Tweet", "Post now playing song to Twitter", "twitter")
+		self.action_group.add_action(action)
+		action.connect("activate", self.handle_manual_title)
+		manager = self.shell.get_ui_manager()
+		manager.insert_action_group(self.action_group, 0)
+		self.uid = manager.add_ui_from_string(menu_ui_str)
+		manager.ensure_update()
+
+	def deactivate_twitter_button(self):
+		manager = self.shell.get_ui_manager()
+		manager.remove_ui(self.uid)
+		manager.remove_action_group(self.action_group)
+		manager.ensure_update()
+
 	def get_song_info(self, entry):
 		self.db = self.shell.get_property('db')
 		artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
@@ -210,10 +325,6 @@ class TwitterPlugin(rb.Plugin):
 			['%s="%s"' % (x, urllib.quote(params[x], '')) for x in params]))
 		res = urllib2.urlopen(req)
 
-	######################################################################
-	# internal utility method
-	######################################################################
-	
 	def prepare_twitter_account(self):
 		gconf_client = gconf.client_get_default()
 		self.connect_twitter_account()
@@ -269,7 +380,23 @@ class TwitterConfigureDialog (object):
 		self.dialog = gladexml.get_widget('preferences_dialog')
 		self.username_button = gladexml.get_widget('username_button')
 		self.username_button_label = gladexml.get_widget('username_button_label')
+
+		self.when_post_rb1_auto_song = gladexml.get_widget("rb1");
+		self.when_post_rb2_auto_album = gladexml.get_widget("rb2");
+		self.when_post_rb3_manual_song = gladexml.get_widget("rb3");
+		if plugin.when_post != None:
+			if plugin.when_post == "auto_song":
+				self.when_post_rb1_auto_song.set_active(True)
+			elif plugin.when_post == "auto_album":
+				self.when_post_rb2_auto_album.set_active(True)
+			elif plugin.when_post == "manual_song":
+				self.when_post_rb3_manual_song.set_active(True)
+
 		self.username_button_image = gladexml.get_widget('username_button_image')
+		self.username_button_image.set_from_file(plugin.find_file("icon/accept.png"));
+		gladexml.get_widget('image1').set_from_file(plugin.find_file("icon/user.png"));
+		gladexml.get_widget('image2').set_from_file(plugin.find_file("icon/music.png"));
+
 		if plugin.screen_name:
 			self.username_button_image.set_visible(False)
 			self.username_button_label.set_label(plugin.screen_name)
@@ -288,6 +415,18 @@ class TwitterConfigureDialog (object):
 		self.plugin.connect_twitter_account()
 
 	def dialog_response (self, dialog, response):
+		if self.when_post_rb1_auto_song.get_active():
+			when_post = "auto_song";
+			self.plugin.deactivate_twitter_button()
+		elif self.when_post_rb2_auto_album.get_active():
+			when_post = "auto_album";
+			self.plugin.deactivate_twitter_button()
+		elif self.when_post_rb3_manual_song.get_active():
+			when_post = "manual_song";
+			self.plugin.activate_twitter_button()
+
+		self.plugin.when_post = when_post
+		gconf.client_get_default().set_string(gconf_keys['when_post'], when_post)
 		dialog.hide()
 
 class TwitterPinDialog (object):

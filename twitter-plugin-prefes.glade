@@ -18,11 +18,29 @@
                         <property name="spacing">5</property>
                         <property name="visible">True</property>
                         <child>
-                            <widget class="GtkLabel" id="label58">
-                                <property name="label" context="yes" translatable="yes">&lt;b&gt;Twitter Account&lt;/b&gt;</property>
-                                <property name="use_markup">True</property>
+                            <widget class="GtkHBox" id="hbox2">
                                 <property name="visible">True</property>
-                                <property name="xalign">0.0</property>
+                                <child>
+                                    <widget class="GtkImage" id="image1">
+                                        <property name="file">icon/user.png</property>
+                                        <property name="visible">True</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="expand">False</property>
+                                    </packing>
+                                </child>
+                                <child>
+                                    <widget class="GtkLabel" id="label">
+                                        <property name="label" context="yes" translatable="yes">&lt;b&gt;Twitter Account&lt;/b&gt;</property>
+                                        <property name="use_markup">True</property>
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0.0</property>
+                                        <property name="xpad">5</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="position">1</property>
+                                    </packing>
+                                </child>
                             </widget>
                             <packing>
                                 <property name="expand">False</property>
@@ -72,7 +90,7 @@
                                                                 <child>
                                                                     <widget class="GtkImage" id="username_button_image">
                                                                         <property name="file">icon/accept.png</property>
-                                                                        <property name="visible">True</property>
+                                                                        <property name="visible">False</property>
                                                                     </widget>
                                                                     <packing>
                                                                         <property name="position">1</property>
@@ -101,6 +119,7 @@
                                 <property name="label" context="yes" translatable="yes">&lt;span color="#666"&gt;( Please push a button to set/change your Username )&lt;/span&gt;</property>
                                 <property name="use_markup">True</property>
                                 <property name="visible">True</property>
+                                <property name="yalign">0.0</property>
                             </widget>
                             <packing>
                                 <property name="position">2</property>
@@ -108,7 +127,99 @@
                         </child>
                     </widget>
                     <packing>
+                        <property name="position">1</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkHSeparator" id="hseparator1">
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
                         <property name="position">2</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkVBox" id="when_vbox">
+                        <property name="border_width">5</property>
+                        <property name="spacing">5</property>
+                        <property name="visible">True</property>
+                        <child>
+                            <widget class="GtkHBox" id="hbox3">
+                                <property name="visible">True</property>
+                                <child>
+                                    <widget class="GtkImage" id="image2">
+                                        <property name="file">icon/music.png</property>
+                                        <property name="visible">True</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="expand">False</property>
+                                    </packing>
+                                </child>
+                                <child>
+                                    <widget class="GtkLabel" id="label2">
+                                        <property name="label" context="yes" translatable="yes">&lt;b&gt;What/When you post?&lt;/b&gt;</property>
+                                        <property name="use_markup">True</property>
+                                        <property name="visible">True</property>
+                                        <property name="xalign">0.0</property>
+                                        <property name="xpad">5</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="position">1</property>
+                                    </packing>
+                                </child>
+                            </widget>
+                        </child>
+                        <child>
+                            <widget class="GtkVBox" id="vbox2">
+                                <property name="border_width">3</property>
+                                <property name="spacing">2</property>
+                                <property name="visible">True</property>
+                                <child>
+                                    <widget class="GtkRadioButton" id="rb1">
+                                        <property name="is_focus">True</property>
+                                        <property name="label" context="yes" translatable="yes">Post song title automatically when playing song changed.</property>
+                                        <property name="visible">True</property>
+                                    </widget>
+                                </child>
+                                <child>
+                                    <widget class="GtkRadioButton" id="rb2">
+                                        <property name="active">False</property>
+                                        <property name="group">rb1</property>
+                                        <property name="label" context="yes" translatable="yes">Post album title automatically when playing album changed.</property>
+                                        <property name="visible">True</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="position">1</property>
+                                    </packing>
+                                </child>
+                                <child>
+                                    <widget class="GtkRadioButton" id="rb3">
+                                        <property name="active">False</property>
+                                        <property name="group">rb1</property>
+                                        <property name="is_focus">True</property>
+                                        <property name="label" context="yes" translatable="yes">Post song title when you click "tweet" button</property>
+                                        <property name="visible">True</property>
+                                    </widget>
+                                    <packing>
+                                        <property name="position">2</property>
+                                    </packing>
+                                </child>
+                            </widget>
+                            <packing>
+                                <property name="position">1</property>
+                            </packing>
+                        </child>
+                    </widget>
+                    <packing>
+                        <property name="position">3</property>
+                    </packing>
+                </child>
+                <child>
+                    <widget class="GtkHSeparator" id="hseparator2">
+                        <property name="visible">True</property>
+                    </widget>
+                    <packing>
+                        <property name="position">4</property>
                     </packing>
                 </child>
                 <child internal-child="action_area">
