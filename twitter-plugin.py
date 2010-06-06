@@ -64,11 +64,6 @@ TWITTER_URLS = {
 
 menu_ui_str = """
 		<ui>
-			<menubar name="MenuBar">
-				<menu name="ControlMenu" action="Control">
-				  <menuitem name="ControlMenuTwitter" action="Twitter"/>
-				</menu>
-			</menubar>
 			<toolbar name="ToolBar">
 				<placeholder name="ToolBarPluginPlaceholder">
 					<toolitem name="Tweet" action="Tweet"/>
@@ -123,6 +118,8 @@ class TwitterPlugin(rb.Plugin):
 	def deactivate(self, shell):
 		self.shell.get_player().disconnect (self.psc_id)
 		del self.psc_id
+
+		self.deactivate_twitter_button()
 
 		del self.last_status
 		if self.db:
@@ -264,10 +261,13 @@ class TwitterPlugin(rb.Plugin):
 		manager.ensure_update()
 
 	def deactivate_twitter_button(self):
+		if self.action_group == None:
+			return
 		manager = self.shell.get_ui_manager()
 		manager.remove_ui(self.uid)
 		manager.remove_action_group(self.action_group)
 		manager.ensure_update()
+		self.action_group = None
 
 	def get_song_info(self, entry):
 		self.db = self.shell.get_property('db')
