@@ -111,6 +111,8 @@ class TwitterPlugin(rb.Plugin):
 		self.last_song = None
 		self.last_album = None
 
+		self.action_group = None
+
 		self.psc_id = player.connect ('playing-song-changed', self.song_change)
 		if player.get_playing_entry():
 			self.song_change (player, player.get_playing_entry())
