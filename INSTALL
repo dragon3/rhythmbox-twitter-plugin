@@ -1,27 +1,8 @@
 ------------------------------------------------------------------------
  Ubuntu 10.04 - Lucid Lynx
 ------------------------------------------------------------------------
-* Install python-simplejson & python-twitter
-$ sudo apt-get install python-twitter
-
-* Install this plugin
-$ cd /tmp
-$ wget http://github.com/dragon3/rhythmbox-twitter-plugin/tarball/master
-$ tar zxfv dragon3-rhythmbox-twitter-plugin-*.tar.gz
-$ cd dragon3-rhythmbox-twitter-plugin-*
-$ make install
-
-------------------------------------------------------------------------
- Ubuntu 9.04 - Jaunty Jackalope
-------------------------------------------------------------------------
-* Install python-simplejson & python-twitter
-$ sudo apt-get install python-simplejson
-$ cd /tmp
-$ wget http://python-twitter.googlecode.com/files/python-twitter-0.6.tar.gz
-$ tar zxfv python-twitter-0.6.tar.gz
-$ cd python-twitter-0.6
-$ python setup.py build
-$ sudo python setup.py install
+* Install Python libraries.
+$ sudo apt-get install python-httplib2 python-gconf python-gobject python-gtk2 python-gnome2 python-glade2
 
 * Install this plugin
 $ cd /tmp
