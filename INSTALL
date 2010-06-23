@@ -2,7 +2,7 @@
  Ubuntu 10.04 - Lucid Lynx
 ------------------------------------------------------------------------
 * Install Python libraries.
-$ sudo apt-get install python-httplib2 python-gconf python-gobject python-gtk2 python-gnome2 python-glade2
+$ sudo apt-get install python-httplib2 python-gconf python-gobject python-gtk2 python-gnome2 python-glade2 python-twitter
 
 * Install this plugin
 $ cd /tmp
