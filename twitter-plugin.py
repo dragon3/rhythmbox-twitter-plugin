@@ -197,6 +197,8 @@ class TwitterPlugin(rb.Plugin):
 		if album == None or album == self.last_album:
 			return
 
+		self.last_album = album
+
 		response = "#nowlistening to "
 		if album != None:
 			response += '"' + album + '"'
