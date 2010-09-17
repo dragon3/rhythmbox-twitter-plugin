@@ -33,6 +33,7 @@ import urllib2
 import urlparse
 import base64
 import webbrowser
+import gettext
 
 from twitter import Api, User
 
@@ -71,6 +72,10 @@ menu_ui_str = """
 			</toolbar>
 		</ui>
 """
+
+STREAM_SONG_ARTIST = 'rb:stream-song-artist'
+STREAM_SONG_TITLE  = 'rb:stream-song-title'
+STREAM_SONG_ALBUM  = 'rb:stream-song-album'
 
 class TwitterPlugin(rb.Plugin):
 
@@ -179,7 +184,11 @@ class TwitterPlugin(rb.Plugin):
 				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
 			else:
 				response = " the " + album + " album."
-		if audioTwit == True: response = "@listensto " + artist + " - " + title
+		if audioTwit == True:
+			response = "@listensto " + artist + " - " + title
+		if response == "#nowlistening to ":
+			if title != None:
+				response += title
 		new_status = response
 		if response and new_status != self.last_status:
 			self.post(new_status)
@@ -275,9 +284,16 @@ class TwitterPlugin(rb.Plugin):
 
 	def get_song_info(self, entry):
 		self.db = self.shell.get_property('db')
-		artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
-		album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
-		title = self.db.entry_get(entry,rhythmdb.PROP_TITLE) or None
+		if entry.get_entry_type().category == rhythmdb.ENTRY_STREAM:
+			artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
+			album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
+			title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
+			if title != None:
+				print >> sys.stderr, "stream: " + title
+		else:
+			artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
+			album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
+			title = self.db.entry_get(entry,rhythmdb.PROP_TITLE) or None
 		return (artist,album,title)
 
 	def create_configure_dialog(self, dialog=None):
