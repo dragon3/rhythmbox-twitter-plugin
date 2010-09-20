@@ -34,6 +34,7 @@ import urlparse
 import base64
 import webbrowser
 import gettext
+from gettext import lgettext as _
 
 from twitter import Api, User
 
@@ -122,6 +123,10 @@ class TwitterPlugin(rb.Plugin):
 		if player.get_playing_entry():
 			self.song_change (player, player.get_playing_entry())
 
+		gettext.bindtextdomain("twitter-plugin", self.find_file("locale"))
+		gettext.textdomain('twitter-plugin')
+		# print >> sys.stderr, "locale: " + self.find_file("locale")
+
 	def deactivate(self, shell):
 		self.shell.get_player().disconnect (self.psc_id)
 		del self.psc_id
@@ -169,29 +174,30 @@ class TwitterPlugin(rb.Plugin):
 		# TODO: audiotwit users change the next line to True
 		audioTwit = False
 
-		response = "#nowlistening to "
+		response = _("#nowlistening to ")
 		if artist != None:
 			if title != None:
-				response += title + " by "
+				response += title + _(" by ")
 			if artist.replace(" ", "") == artist: response += "#"
 			response += artist
 		if album != None:
 			if response:
-				response += " from " + album + "."
+				response += _(" from ") + album + "."
 				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
 				lastFmUrl = lastFmUrl.replace("%20", "%2B")
 				lastFmUrl = self.shorten_url(lastFmUrl)
 				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
 			else:
-				response = " the " + album + " album."
+				response = _(" the ") + album + _(" album.")
 		if audioTwit == True:
 			response = "@listensto " + artist + " - " + title
-		if response == "#nowlistening to ":
+		if response == _("#nowlistening to "):
 			if title != None:
 				response += title
 		new_status = response
 		if response and new_status != self.last_status:
 			self.post(new_status)
+			# print >> sys.stderr, "status: " + new_status
 			self.last_status = new_status
 		self.last_song = title
 
@@ -208,17 +214,18 @@ class TwitterPlugin(rb.Plugin):
 
 		self.last_album = album
 
-		response = "#nowlistening to "
+		response = _("#nowlistening to ")
 		if album != None:
 			response += '"' + album + '"'
 		if artist != None:
-			response += " by "
+            response += _(" by ")
 			if artist.replace(" ", "") == artist:
 				response += "#"
 			response += artist
 		new_status = response
 		if response and new_status != self.last_status:
 			self.post(new_status)
+			# print >> sys.stderr, "status: " + new_status
 			self.last_status = new_status
 
 	def handle_manual_title(self, control):
@@ -233,24 +240,25 @@ class TwitterPlugin(rb.Plugin):
 		if title == self.last_song:
 			return
 
-		response = "#nowlistening to "
+		response = _("#nowlistening to ")
 		if artist != None:
 			if title != None:
-				response += title + " by "
+				response += title + _(" by ")
 			if artist.replace(" ", "") == artist: response += "#"
 			response += artist
 		if album != None:
 			if response:
-				response += " from " + album + "."
+				response += _(" from ") + album + "."
 				lastFmUrl = "http://www.last.fm/search?q=" + urllib.quote(artist + " " + title)
 				lastFmUrl = lastFmUrl.replace("%20", "%2B")
 				lastFmUrl = self.shorten_url(lastFmUrl)
 				if len(response + " " + lastFmUrl) <= 140: response += " " + lastFmUrl
 			else:
-				response = " the " + album + " album."
+				response = _(" the ") + album + _(" album.")
 		new_status = response
 		if response and new_status != self.last_status:
 			self.post(new_status)
+			# print >> sys.stderr, "status: " + new_status
 			self.last_status = new_status
 		self.last_song = title
 
@@ -289,7 +297,7 @@ class TwitterPlugin(rb.Plugin):
 			album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
 			title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
 			if title != None:
-				print >> sys.stderr, "stream: " + title
+				# print >> sys.stderr, "stream: " + title
 		else:
 			artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
 			album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
