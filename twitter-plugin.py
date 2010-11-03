@@ -218,7 +218,7 @@ class TwitterPlugin(rb.Plugin):
 		if album != None:
 			response += '"' + album + '"'
 		if artist != None:
-            response += _(" by ")
+			response += _(" by ")
 			if artist.replace(" ", "") == artist:
 				response += "#"
 			response += artist
