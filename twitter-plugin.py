@@ -292,12 +292,10 @@ class TwitterPlugin(rb.Plugin):
 
 	def get_song_info(self, entry):
 		self.db = self.shell.get_property('db')
-		if entry.get_entry_type().category == rhythmdb.ENTRY_STREAM:
+		if entry.get_entry_type().props.category == rhythmdb.ENTRY_STREAM:
 			artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
 			album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
 			title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
-			if title != None:
-				# print >> sys.stderr, "stream: " + title
 		else:
 			artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
 			album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
