@@ -1,0 +1,33 @@
+# Portuguese
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.03\n"
+"POT-Creation-Date: 2010-09-18 00:51+JST\n"
+"PO-Revision-Date: 2010-09-20 23:16+JST\n"
+"Last-Translator: \n"
+"Language-Team: Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Generated-By: pygettext.py 1.5\n"
+
+
+#: twitter-plugin.py:173 twitter-plugin.py:192
+msgid "#nowlistening to "
+msgstr "#Escuchando "
+
+#: twitter-plugin.py:177
+msgid " by "
+msgstr " de "
+
+#: twitter-plugin.py:183
+msgid " from "
+msgstr " del album "
+
+#: twitter-plugin.py:189
+msgid " album."
+msgstr "."
+
+#: twitter-plugin.py:189
+msgid " the "
+msgstr " el album "
+
