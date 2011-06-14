@@ -292,20 +292,20 @@ class TwitterPlugin(rb.Plugin):
 
 	def get_song_info(self, entry):
 		self.db = self.shell.get_property('db')
-        if hasattr(entry.get_entry_type(), 'props') :
-            if entry.get_entry_type().props.category == rhythmdb.ENTRY_STREAM:
-                artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
-                album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
-                title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
+		if hasattr(entry.get_entry_type(), 'props') :
+			if entry.get_entry_type().props.category == rhythmdb.ENTRY_STREAM:
+				artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
+				album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
+				title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
 		else:
-            if (entry.get_entry_type().category == rhythmdb.ENTRY_STREAM) :
-                artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
-                album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
-                title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
-            else:
-                artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
-                album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
-                title = self.db.entry_get(entry,rhythmdb.PROP_TITLE) or None
+			if (entry.get_entry_type().category == rhythmdb.ENTRY_STREAM) :
+				artist = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ARTIST) or None
+				album  = self.db.entry_request_extra_metadata (entry, STREAM_SONG_ALBUM) or None
+				title = self.db.entry_request_extra_metadata (entry, STREAM_SONG_TITLE) or None
+			else:
+				artist = self.db.entry_get (entry, rhythmdb.PROP_ARTIST) or None
+				album = self.db.entry_get (entry, rhythmdb.PROP_ALBUM) or None
+				title = self.db.entry_get(entry,rhythmdb.PROP_TITLE) or None
 		return (artist,album,title)
 
 	def create_configure_dialog(self, dialog=None):
