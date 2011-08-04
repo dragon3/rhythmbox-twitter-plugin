@@ -41,6 +41,9 @@ from twitter import Api, User
 import urlparse
 import oauth2 as oauth
 
+import httplib2
+import socks
+
 VERSION = '1.02'
 
 gconf_keys = {
@@ -363,7 +366,12 @@ class TwitterPlugin(rb.Plugin):
 
 	def connect_twitter_account(self):
 		self.consumer = oauth.Consumer(self.consumer_key, self.consumer_secret)
-		client = oauth.Client(self.consumer)
+		proxy = self.parse_proxy()
+		if proxy is not None:
+			client = oauth.Client(self.consumer,
+					proxy_info=httplib2.ProxyInfo(socks.PROXY_TYPE_HTTP, proxy[0], proxy[1]))
+		else:
+			client = oauth.Client(self.consumer)
 		request_token = self.get_request_token(client)
 
 		authorization_url = "%s?oauth_token=%s" % (TWITTER_URLS['authorize'], request_token['oauth_token'])
@@ -371,12 +379,26 @@ class TwitterPlugin(rb.Plugin):
 		webbrowser.open_new(authorization_url)
 
 		self.create_pin_dialog(request_token=request_token)
+
+	def parse_proxy(self):
+		proxy = os.getenv("http_proxy")
+		if proxy is None:
+			return None
+		proxy_parts = urlparse.urlparse(proxy)
+		address = proxy_parts.netloc.split(':')[0]
+		port = proxy_parts.netloc.split(':')[1]
+		return (address, int(port))
 		
 	def get_access_token(self, pin, request_token):
 		token = oauth.Token(request_token['oauth_token'],
 							request_token['oauth_token_secret'])
 		token.set_verifier(pin)
-		client = oauth.Client(self.consumer, token)
+		proxy = self.parse_proxy()
+		if proxy is not None:
+			client = oauth.Client(self.consumer, token,
+					proxy_info=httplib2.ProxyInfo(socks.PROXY_TYPE_HTTP, proxy[0], proxy[1]))
+		else:
+			client = oauth.Client(self.consumer, token)
 		resp, content = client.request(TWITTER_URLS['access_token'], "POST")
 		access_token = dict(urlparse.parse_qsl(content))
 
